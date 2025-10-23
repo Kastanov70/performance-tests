@@ -1,0 +1,8 @@
+.dockerignore
+.git
+.gitignore
+.python-version
+.venv
+Dockerfile
+pyproject.toml
+uv.lock
