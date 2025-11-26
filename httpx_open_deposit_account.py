@@ -13,7 +13,7 @@ with httpx.Client() as client:
         "middleName": "string",
         "phoneNumber": "string",
     }
-    create_user_response = httpx.post(
+    create_user_response = client.post(
         "http://localhost:8003/api/v1/users", json=create_user_payload
     )
     create_user_response_data = create_user_response.json()
@@ -22,7 +22,7 @@ with httpx.Client() as client:
     create_deposit_account_payload = {
         "userId": f"{create_user_response_data['user']['id']}"
     }
-    create_deposit_account_response = httpx.post(
+    create_deposit_account_response = client.post(
         "http://localhost:8003/api/v1/accounts/open-deposit-account",
         json=create_deposit_account_payload,
     )
