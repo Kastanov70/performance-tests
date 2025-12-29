@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 class UserSchema(BaseModel):
@@ -30,15 +30,28 @@ class CreateUserRequestSchema(BaseModel):
 
     Используется как модель запроса для endpoint'а POST /api/v1/users создания пользователя.
     Все поля обязательны для заполнения.
-    Поддерживает прием данных в формате camelCase через алиасы полей.
+    
+    Особенности:
+    - Поддерживает прием данных в формате camelCase через алиасы полей
+    - Конфигурация populate_by_name=True позволяет использовать как snake_case, так и camelCase 
+      при создании экземпляров модели
+    - Поле email автоматически валидируется на корректность формата электронной почты
 
     Attributes:
         email (EmailStr): Адрес электронной почты (валидируется на корректность формата).
-        last_name (str): Фамилия пользователя (алиас 'lastName' для camelCase).
-        first_name (str): Имя пользователя (алиас 'firstName' для camelCase).
-        middle_name (str): Отчество пользователя (алиас 'middleName' для camelCase).
-        phone_number (str): Номер телефона пользователя (алиас 'phoneNumber' для camelCase).
+        last_name (str): Фамилия пользователя (принимает 'lastName' в camelCase).
+        first_name (str): Имя пользователя (принимает 'firstName' в camelCase).
+        middle_name (str): Отчество пользователя (принимает 'middleName' в camelCase).
+        phone_number (str): Номер телефона пользователя (принимает 'phoneNumber' в camelCase).
+
+    Note:
+        При создании экземпляра можно использовать любой стиль именования:
+        CreateUserRequestSchema(last_name="Иванов") или 
+        CreateUserRequestSchema(lastName="Иванов")
     """
+    
+    model_config = ConfigDict(populate_by_name=True)
+
     email: EmailStr
     last_name: str = Field(alias="lastName")
     first_name: str = Field(alias="firstName")
