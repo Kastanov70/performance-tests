@@ -16,3 +16,6 @@ uv.lock
 
 # My comments
 comments.txt
+
+# IDE settings
+.vscode/
