@@ -3,44 +3,69 @@ from pydantic import BaseModel, HttpUrl, Field, ConfigDict
 
 class DocumentSchema(BaseModel):
     """
-    Словарь с информацией о документе.
+    Схема документа с ссылкой и содержимым.
     
-    Атрибуты:
-        url: URL для доступа к документу.
-        document: Содержимое или идентификатор документа.
+    Используется для представления документа в системе, содержащего URL для доступа
+    и текстовое содержимое или идентификатор документа.
+
+    Attributes:
+        url (HttpUrl): Валидный URL-адрес для доступа к документу.
+                       Автоматически валидируется на корректность формата URL.
+        document (str): Содержимое документа в текстовом формате или его уникальный идентификатор.
     """
     url: HttpUrl
     document: str
 
 
 class GetTariffDocumentRequestSchema(BaseModel):
+    """
+    Схема запроса для получения документа тарифа.
+    
+    Содержит идентификатор счета, для которого требуется получить тарифный документ.
+    Поддерживает получение данных в формате camelCase через алиас.
+
+    Attributes:
+        account_id (str): Уникальный идентификатор счета (принимает 'accountId' в camelCase).
+    """
     model_config = ConfigDict(populate_by_name=True)
     account_id: str = Field(alias="accountId")
 
 
 class GetContractDocumentRequestSchema(BaseModel):
+    """
+    Схема запроса для получения документа контракта.
+    
+    Содержит идентификатор счета, для которого требуется получить контрактный документ.
+    Поддерживает получение данных в формате camelCase через алиас.
+
+    Attributes:
+        account_id (str): Уникальный идентификатор счета (принимает 'accountId' в camelCase).
+    """
     model_config = ConfigDict(populate_by_name=True)
     account_id: str = Field(alias="accountId")
 
 
 class GetTariffDocumentResponseSchema(BaseModel):
     """
-    Словарь с ответом на запрос документа тарифа.
+    Схема ответа с документом тарифа.
     
-    Атрибуты:
-        tariff: Информация о документе тарифа.
+    Возвращается в ответ на запрос получения тарифного документа.
+    Содержит информацию о документе тарифа в формате DocumentSchema.
+
+    Attributes:
+        tariff (DocumentSchema): Объект с данными тарифного документа.
     """
     tariff: DocumentSchema
 
 
 class GetContractDocumentResponseSchema(BaseModel):
     """
-    Словарь с ответом на запрос документа контракта.
+    Схема ответа с документом контракта.
     
-    Атрибуты:
-        tariff: Информация о документе контракта.
-        Примечание: Название атрибута 'tariff' может быть опечаткой,
-        следует уточнить у разработчиков API.
+    Возвращается в ответ на запрос получения контрактного документа.
+    Содержит информацию о документе контракта в формате DocumentSchema.
+
+    Attributes:
+        contract (DocumentSchema): Объект с данными контрактного документа.
     """
     contract: DocumentSchema
-
