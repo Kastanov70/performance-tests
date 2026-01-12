@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict
+from datetime import datetime
 from enum import StrEnum
+
+from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 
 class OperationStatus(StrEnum):
     """
@@ -49,7 +51,7 @@ class OperationSchema(BaseModel):
         amount: Сумма операции (отрицательная для расходов, положительная для доходов).
         card_id: Идентификатор карты, через которую проведена операция.
         category: Категория операции (например, "Супермаркеты", "Транспорт").
-        created_at: Дата и время создания операции в формате строки.
+        created_at: Дата и время создания операции в формате datetime.
         account_id: Идентификатор счёта, к которому относится операция.
     """
     id: str
@@ -58,7 +60,7 @@ class OperationSchema(BaseModel):
     amount: float
     card_id: str = Field(alias="cardId")
     category: str
-    created_at: str = Field(alias="createdAt")
+    created_at: datetime = Field(alias="createdAt")
     account_id: str = Field(alias="accountId")
 
 
@@ -70,7 +72,7 @@ class OperationReceiptSchema(BaseModel):
         url: URL-адрес для доступа к электронному чеку.
         document: Документ чека в строковом формате (например, JSON или XML).
     """
-    url: str
+    url: HttpUrl
     document: str
 
 
@@ -88,6 +90,16 @@ class OperationsSummarySchema(BaseModel):
     cashback_amount: float = Field(alias="cashbackAmount")
 
 
+class GetOperationResponseSchema(BaseModel):
+    """
+    Схема ответа на запрос получения детальной информации об операции.
+    
+    Attributes:
+        operation: Объект OperationSchema с детальной информацией об операции.
+    """
+    operation: OperationSchema
+
+
 class GetOperationsQuerySchema(BaseModel):
     """
     Схема запроса для получения списка операций по счёту.
@@ -96,169 +108,6 @@ class GetOperationsQuerySchema(BaseModel):
         account_id: Идентификатор счёта пользователя.
     """
     model_config = ConfigDict(populate_by_name=True)
-    account_id: str = Field(alias="accountId")
-
-
-class GetOperationsSummaryQuerySchema(BaseModel):
-    """
-    Схема запроса для получения сводной статистики по операциям.
-    
-    Attributes:
-        account_id: Идентификатор счёта пользователя.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    account_id: str = Field(alias="accountId")
-
-
-class GetOperationQuerySchema(BaseModel):
-    """
-    Схема запроса для получения детальной информации об одной операции.
-    
-    Attributes:
-        operation_id: Уникальный идентификатор операции.
-    """
-    operation_id: str
-
-
-class GetOperationQueryReceiptSchema(BaseModel):
-    """
-    Схема запроса для получения чека по конкретной операции.
-    
-    Attributes:
-        operation_id: Уникальный идентификатор операции.
-    """
-    operation_id: str
-
-
-class GetOperationsSummarySchema(BaseModel):
-    """
-    Схема запроса для получения статистики по операциям.
-    
-    Attributes:
-        account_id: Идентификатор счёта пользователя.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    account_id: str = Field(alias="accountId")
-
-
-class MakeFeeOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции комиссии.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма комиссии.
-        card_id: Идентификатор карты, к которой относится операция.
-        account_id: Идентификатор счёта, к которому относится операция.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-
-
-class MakeTopUpOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции пополнения счёта.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма пополнения.
-        card_id: Идентификатор карты, через которую выполняется пополнение.
-        account_id: Идентификатор счёта, который пополняется.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-
-
-class MakeCashbackOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции кэшбэка.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма кэшбэка.
-        card_id: Идентификатор карты, к которой начисляется кэшбэк.
-        account_id: Идентификатор счёта, к которому относится операция.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-
-
-class MakeTransferOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции перевода средств.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма перевода.
-        card_id: Идентификатор карты, с которой выполняется перевод.
-        account_id: Идентификатор счёта, с которого выполняется перевод.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-
-
-class MakePurchaseOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции покупки.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма покупки.
-        card_id: Идентификатор карты, с которой выполняется оплата.
-        account_id: Идентификатор счёта, к которому относится операция.
-        category: Категория покупки (например, "Продукты", "Развлечения").
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-    category: str
-
-
-class MakeBillPaymentOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции оплаты счёта.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма оплаты.
-        card_id: Идентификатор карты, с которой выполняется оплата.
-        account_id: Идентификатор счёта, к которому относится операция.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
-    account_id: str = Field(alias="accountId")
-
-
-class MakeCashWithdrawalOperationRequestSchema(BaseModel):
-    """
-    Схема запроса для создания операции снятия наличных.
-    
-    Attributes:
-        status: Статус создаваемой операции.
-        amount: Сумма снятия наличных.
-        card_id: Идентификатор карты, с которой выполняется снятие.
-        account_id: Идентификатор счёта, к которому относится операция.
-    """
-    model_config = ConfigDict(populate_by_name=True)
-    status: OperationStatus
-    amount: float
-    card_id: str = Field(alias="cardId")
     account_id: str = Field(alias="accountId")
 
 
@@ -272,24 +121,15 @@ class GetOperationsResponseSchema(BaseModel):
     operations: list[OperationSchema]
 
 
-class GetOperationResponseSchema(BaseModel):
+class GetOperationsSummaryQuerySchema(BaseModel):
     """
-    Схема ответа на запрос получения детальной информации об операции.
+    Схема запроса для получения сводной статистики по операциям.
     
     Attributes:
-        operation: Объект OperationSchema с детальной информацией об операции.
+        account_id: Идентификатор счёта пользователя.
     """
-    operation: OperationSchema
-
-
-class GetOperationReceiptResponseSchema(BaseModel):
-    """
-    Схема ответа на запрос получения чека по операции.
-    
-    Attributes:
-        receipt: Объект OperationReceiptSchema с данными чека.
-    """
-    receipt: OperationReceiptSchema
+    model_config = ConfigDict(populate_by_name=True)
+    account_id: str = Field(alias="accountId")
 
 
 class GetOperationsSummaryResponseSchema(BaseModel):
@@ -302,6 +142,42 @@ class GetOperationsSummaryResponseSchema(BaseModel):
     summary: OperationsSummarySchema
 
 
+class GetOperationReceiptResponseSchema(BaseModel):
+    """
+    Схема ответа на запрос получения чека по операции.
+    
+    Attributes:
+        receipt: Объект OperationReceiptSchema с данными чека.
+    """
+    receipt: OperationReceiptSchema
+
+
+class MakeOperationRequestSchema(BaseModel):
+    """
+    Базовая схема запроса для создания операции.
+    
+    Attributes:
+        status: Статус создаваемой операции.
+        amount: Сумма комиссии.
+        card_id: Идентификатор карты, к которой относится операция.
+        account_id: Идентификатор счёта, к которому относится операция.
+    """
+    model_config = ConfigDict(populate_by_name=True)
+
+    status: OperationStatus
+    amount: float
+    card_id: str = Field(alias="cardId")
+    account_id: str = Field(alias="accountId")
+
+
+class MakeFeeOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции комиссии.
+    Наследуется от MakeOperationRequestSchema
+    """
+    pass
+
+
 class MakeFeeOperationResponseSchema(BaseModel):
     """
     Схема ответа на запрос создания операции комиссии.
@@ -310,6 +186,14 @@ class MakeFeeOperationResponseSchema(BaseModel):
         operation: Созданный объект OperationSchema.
     """
     operation: OperationSchema
+
+
+class MakeTopUpOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции пополнения счёта.
+    Наследуется от MakeOperationRequestSchema
+    """
+    pass
 
 
 class MakeTopUpOperationResponseSchema(BaseModel):
@@ -322,6 +206,14 @@ class MakeTopUpOperationResponseSchema(BaseModel):
     operation: OperationSchema
 
 
+class MakeCashbackOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции кэшбэка.
+    Наследуется от MakeOperationRequestSchema
+    """
+    pass
+
+
 class MakeCashbackOperationResponseSchema(BaseModel):
     """
     Схема ответа на запрос создания операции кэшбэка.
@@ -330,6 +222,14 @@ class MakeCashbackOperationResponseSchema(BaseModel):
         operation: Созданный объект OperationSchema.
     """
     operation: OperationSchema
+
+
+class MakeTransferOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции перевода средств.
+    Наследуется от MakeOperationRequestSchema.
+    """
+    pass
 
 
 class MakeTransferOperationResponseSchema(BaseModel):
@@ -342,6 +242,20 @@ class MakeTransferOperationResponseSchema(BaseModel):
     operation: OperationSchema
 
 
+class MakePurchaseOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции покупки.
+    Наследуется от MakeOperationRequestSchema.
+    Attributes:
+        status: Статус создаваемой операции.
+        amount: Сумма покупки.
+        card_id: Идентификатор карты, с которой выполняется оплата.
+        account_id: Идентификатор счёта, к которому относится операция.
+        category: Категория покупки (например, "Продукты", "Развлечения").
+    """
+    category: str
+
+
 class MakePurchaseOperationResponseSchema(BaseModel):
     """
     Схема ответа на запрос создания операции покупки.
@@ -352,6 +266,14 @@ class MakePurchaseOperationResponseSchema(BaseModel):
     operation: OperationSchema
 
 
+class MakeBillPaymentOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции оплаты счёта.
+    Наследуется от MakeOperationRequestSchema.
+    """
+    pass
+
+
 class MakeBillPaymentOperationResponseSchema(BaseModel):
     """
     Схема ответа на запрос создания операции оплаты счёта.
@@ -360,6 +282,14 @@ class MakeBillPaymentOperationResponseSchema(BaseModel):
         operation: Созданный объект OperationSchema.
     """
     operation: OperationSchema
+
+
+class MakeCashWithdrawalOperationRequestSchema(MakeOperationRequestSchema):
+    """
+    Схема запроса для создания операции снятия наличных.
+    Наследуется от MakeOperationRequestSchema.
+    """
+    pass
 
 
 class MakeCashWithdrawalOperationResponseSchema(BaseModel):
