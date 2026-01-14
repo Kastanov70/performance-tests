@@ -1,8 +1,6 @@
-import time
+from httpx import Response
 
-# from httpx import Response
-
-from clients.http.client import HTTPClient, Response
+from clients.http.client import HTTPClient
 from clients.http.gateway.client import build_gateway_http_client
 from clients.http.gateway.users.schema import (
     GetUserResponseSchema,
