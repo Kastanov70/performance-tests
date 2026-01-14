@@ -1,8 +1,8 @@
 import time
 
-from httpx import Response
+# from httpx import Response
 
-from clients.http.client import HTTPClient
+from clients.http.client import HTTPClient, Response
 from clients.http.gateway.client import build_gateway_http_client
 from clients.http.gateway.users.schema import (
     GetUserResponseSchema,
@@ -83,9 +83,7 @@ class UsersGatewayHTTPClient(HTTPClient):
         """
         Создает тестового пользователя с автоматически сгенерированными данными.
         
-        Генерирует уникальный email на основе временной метки и использует
-        фиксированные тестовые значения для остальных полей. После создания
-        валидирует ответ в CreateUserResponseSchema.
+        Создает экземпляр CreateUserResponseSchema со значениями по умолчанию.
         
         Returns:
             CreateUserResponseSchema: Валидированная схема с данными созданного пользователя.
@@ -98,13 +96,7 @@ class UsersGatewayHTTPClient(HTTPClient):
             pydantic.ValidationError: Если структура ответа не соответствует схеме.
             httpx.HTTPStatusError: При ошибках HTTP-запроса.
         """
-        request = CreateUserRequestSchema(
-            email=f"user.{time.time()}@example.com",
-            last_name="string",
-            first_name="string",
-            middle_name="string",
-            phone_number="string"
-        )
+        request = CreateUserRequestSchema()
         response = self.create_user_api(request)
         return CreateUserResponseSchema.model_validate_json(response.text)
 
