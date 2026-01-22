@@ -3,6 +3,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 
+from tools.fakers import fake
+
 class OperationStatus(StrEnum):
     """
     Перечисление статусов операций.
@@ -164,8 +166,8 @@ class MakeOperationRequestSchema(BaseModel):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    status: OperationStatus
-    amount: float
+    status: OperationStatus = Field(default_factory=lambda: fake.enum(OperationStatus))
+    amount: float = Field(default_factory=lambda: fake.amount())
     card_id: str = Field(alias="cardId")
     account_id: str = Field(alias="accountId")
 
@@ -253,7 +255,7 @@ class MakePurchaseOperationRequestSchema(MakeOperationRequestSchema):
         account_id: Идентификатор счёта, к которому относится операция.
         category: Категория покупки (например, "Продукты", "Развлечения").
     """
-    category: str
+    category: str = Field(default_factory=lambda: fake.category())
 
 
 class MakePurchaseOperationResponseSchema(BaseModel):
