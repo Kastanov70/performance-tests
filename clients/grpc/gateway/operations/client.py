@@ -320,7 +320,7 @@ class OperationsGatewayService(GRPCClient):
         )
         return self.make_cash_withdrawal_operation_api(request=request)
 
-def build_users_gateway_grpc_client() -> OperationsGatewayService:
+def build_operations_gateway_grpc_client() -> OperationsGatewayService:
     """
     Фабричная функция для создания экземпляра OperationsGatewayService.
     Создает клиент с предварительно настроенным gRPC-каналом.
