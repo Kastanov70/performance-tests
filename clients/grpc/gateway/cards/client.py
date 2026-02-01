@@ -61,10 +61,10 @@ class CardsGatewayGRPCClient(GRPCClient):
         :return: Ответ с информацией о выпуске физической карты.
         """
         request = IssuePhysicalCardRequest(user_id = user_id, account_id = account_id)
-        return self.create_user_api(request)
+        return self.issue_physical_card_api(request)
 
 
-def build_users_gateway_grpc_client() -> CardsGatewayGRPCClient:
+def build_cards_gateway_grpc_client() -> CardsGatewayGRPCClient:
     """
     Фабрика для создания экземпляра CardsGatewayGRPCClient.
     :return: Инициализированный клиент для CardsGatewayGRPCClient.
