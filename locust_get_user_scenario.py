@@ -19,5 +19,4 @@ class GetUserScenarioUser(HttpUser):
             "phoneNumber": fake.phone_number()
         }
         response = self.client.post("/api/v1/users", json=request)
-        print(response.text)
         self.user_data = response.json()
