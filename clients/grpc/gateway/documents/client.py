@@ -1,5 +1,5 @@
 from grpc import Channel
-from locust.env import Environment  # Импорт окружения Locust
+from locust.env import Environment
 
 from clients.grpc.client import GRPCClient
 from clients.grpc.gateway.client import build_gateway_grpc_client, build_gateway_locust_grpc_client
@@ -66,7 +66,6 @@ def build_documents_gateway_grpc_client() -> DocumentsGatewayGRPCClient:
     return DocumentsGatewayGRPCClient(channel=build_gateway_grpc_client())
 
 
-# Новый билдер для нагрузочного тестирования
 def build_documents_gateway_locust_grpc_client(environment: Environment) -> DocumentsGatewayGRPCClient:
     """
     Функция создаёт экземпляр DocumentsGatewayGRPCClient адаптированного под Locust.
