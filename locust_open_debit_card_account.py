@@ -17,7 +17,7 @@ class OpenDebitCardAccountScenarioUser(User):
         # Задачу @task, которая:
         # Открывает debit card счет для пользователя;
         # передаёт id созданного пользователя.
-        self.accounts_gateway_client.open_credit_card_account(self.create_user_response.user.id)
+        self.accounts_gateway_client.open_debit_card_account(self.create_user_response.user.id)
     
     def on_start(self) -> None:
         # Create User
