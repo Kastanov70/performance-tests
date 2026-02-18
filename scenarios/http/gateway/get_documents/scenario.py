@@ -1,24 +1,23 @@
 from locust import User, between, task
 
-# Импортируем схемы ответов, чтобы типизировать shared state
-from clients.grpc.gateway.locust import GatewayGRPCSequentialTaskSet
-from contracts.services.gateway.accounts.rpc_open_savings_account_pb2 import OpenSavingsAccountResponse
-from contracts.services.gateway.users.rpc_create_user_pb2 import CreateUserResponse
+from clients.http.gateway.locust import GatewayHTTPSequentialTaskSet
+from clients.http.gateway.users.schema import CreateUserResponseSchema
+from clients.http.gateway.accounts.schema import OpenSavingsAccountResponseSchema
 
 
-class GetDocumentSequentialTaskSet(GatewayGRPCSequentialTaskSet):
+class GetDocumentSequentialTaskSet(GatewayHTTPSequentialTaskSet):
     """
     Нагрузочный сценарий, который последовательно:
     1. Создаёт нового пользователя.
     2. Открывает сберегательный счёт.
     3. Получает документы по счёту (тариф и контракт).
 
-    Использует базовый GatewayGRPCSequentialTaskSet и уже созданных в нём API клиентов.
+    Использует базовый GatewayHTTPSequentialTaskSet и уже созданных в нём API клиентов.
     """
 
     # Shared state — сохраняем результаты запросов для дальнейшего использования
-    create_user_response: CreateUserResponse | None = None
-    open_savings_account_response: OpenSavingsAccountResponse | None = None
+    create_user_response: CreateUserResponseSchema | None = None
+    open_savings_account_response: OpenSavingsAccountResponseSchema | None = None
 
     @task
     def create_user(self):
