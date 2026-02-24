@@ -5,8 +5,7 @@ from seeds.builder import build_grpc_seeds_builder
 from seeds.dumps import save_seeds_result, load_seeds_result
 
 # Импортируем схемы плана сидинга (описывают структуру данных)
-from seeds.schema.plan import SeedsPlan, SeedUsersPlan, SeedCardsPlan, SeedAccountsPlan
-
+from seeds.schema.plan import SeedsPlan, SeedUsersPlan, SeedCardsPlan, SeedAccountsPlan, SeedOperationsPlan
 
 # Шаг 1. Создаём билдер, который будет генерировать данные через gRPC
 builder = build_grpc_seeds_builder()
@@ -20,18 +19,20 @@ builder = build_grpc_seeds_builder()
 result = builder.build(
     SeedsPlan(
         users=SeedUsersPlan(
-            count=100,
+            count=10,
             credit_card_accounts=SeedAccountsPlan(
                 count=1,
-                physical_cards=SeedCardsPlan(count=1)
+                virtual_cards=SeedCardsPlan(count=1),
+                transfer_operations=SeedOperationsPlan(count=1),
+                cash_withdrawal_operations=SeedOperationsPlan(count=1)
             )
         ),
     )
 )
 
 # Шаг 3. Сохраняем результат сидинга в файл, привязанный к сценарию "test-scenario"
-save_seeds_result(result=result, scenario="test-scenario")
+save_seeds_result(result=result, scenario="test-op-scenario")
 
 # Шаг 4. Загружаем данные из файла и выводим в консоль
-print(load_seeds_result(scenario="test-scenario"))
+print(load_seeds_result(scenario="test-op-scenario"))
 
