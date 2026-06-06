@@ -8,6 +8,7 @@ from clients.http.gateway.users.schema import (
     CreateUserRequestSchema,
     CreateUserResponseSchema
 )
+from tools.routes import APIRoutes
 
 
 class UsersGatewayHTTPClient(HTTPClient):
@@ -36,8 +37,8 @@ class UsersGatewayHTTPClient(HTTPClient):
             httpx.HTTPStatusError: При получении статус-кода 4xx или 5xx от сервера.
         """
         return self.get(
-            f"/api/v1/users/{user_id}",
-            extensions=HTTPClientExtensions(route="/api/v1/users/{user_id}")
+            f"{APIRoutes.USERS}/{user_id}",
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.USERS}/{{user_id}}")
         )
 
     def create_user_api(self, request: CreateUserRequestSchema) -> Response:
@@ -59,7 +60,7 @@ class UsersGatewayHTTPClient(HTTPClient):
         Raises:
             httpx.HTTPStatusError: При ошибках валидации или конфликтах данных.
         """
-        return self.post("/api/v1/users", json=request.model_dump(by_alias=True))
+        return self.post(APIRoutes.USERS, json=request.model_dump(by_alias=True))
 
     def get_user(self, user_id: str) -> GetUserResponseSchema:
         """
