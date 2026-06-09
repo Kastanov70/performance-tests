@@ -72,18 +72,39 @@ jobs:
       - name: Run load tests and generate HTML report
         run: locust --config=${{ github.event.inputs.SCENARIO }} --html=./reports/${{ github.run_id }}/index.html
 
-      # 9. Деплой HTML-отчёта в GitHub Pages, чтобы можно было посмотреть результаты в браузере
-      - name: Deploy HTML report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v4
+      # 9. Загружаем папку reports как артефакт для передачи в следующую джобу
+      - name: Upload reports artifact
+        if: always()  # Загружаем даже при ошибке тестов
+        uses: actions/upload-artifact@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Авторизация для push в gh-pages
-          keep_files: true  # Сохраняем предыдущие отчёты
-          publish_dir: reports  # Публикуем директорию reports
-          publish_branch: gh-pages  # На ветке gh-pages
+          name: reports
+          path: reports
+          retention-days: 7  # Храним артефакт 7 дней
 
       # 10. Корректно останавливаем docker-контейнеры и удаляем volume-ы (например, temp-файлы)
       - name: Stop test services
         if: always()
         run: docker compose -f docker-compose.ci.yaml down -v
         working-directory: performance-qa-engineer-course
+
+  publish-report:
+    needs: run-tests  # Запускается только после выполнения run-tests
+    if: always()  # Запускается даже если run-tests завершилась с ошибкой
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Скачиваем артефакт reports, загруженный джобой run-tests
+      - name: Download reports artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: reports
+          path: reports
+
+      # 2. Деплой HTML-отчёта в GitHub Pages
+      - name: Deploy HTML report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          keep_files: true  # Сохраняем предыдущие отчёты
+          publish_dir: reports
+          publish_branch: gh-pages
