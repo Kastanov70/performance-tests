@@ -1,13 +1,26 @@
+# pycharm
+.idea
+
+# python
+.venv
+venv
+__pycache__
+
+# locust
+dumps
+locust_*.csv
+locust_*.json
+report.html
+
+# Mac OS
+.DS_Store
+
 # Python-generated files
-__pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
-
-# Virtual environments
-.venv
 
 # UV ignore
 pyproject.toml
@@ -19,8 +32,3 @@ comments.txt
 
 # IDE settings
 .vscode/
-.idea
-
-# Mac
-.DS_Store
-
